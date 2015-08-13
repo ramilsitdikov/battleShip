@@ -1,4 +1,4 @@
-#game_space {
+.game_space {
 	display: inline;
 	width: 600px;
 	height: 1100px;
@@ -6,9 +6,9 @@
 .field {
 	float: left;
 }
-#player_field, #computer_field {
-	width: 420px;
-	height: 420px;
+.player_field, .computer_field {
+	width: 423px;
+	height: 423px;
 	float: left;
 	margin: 10px;
 	border: 2px dashed red;
@@ -19,19 +19,25 @@
 	line-height: 5px;
 	letter-spacing: 10px;
 }
-#player_field .ship {
-	background: url(ship.png) no-repeat center center;;
+.player_field .ship {
+	background: url(../images/ship.png) no-repeat center center;
+	background-size: contain;
 }
-#computer_field .ship, .water {
+.computer_field .ship, .water {
 	background: #eee;
 }
 .dead {
-	background: url(fire.gif) no-repeat center center;
+	background: url(../images/fire.gif) no-repeat center center;
+	background-size: contain;
+}
+.injured {
+
 }
 .missed {
-	background: gray;
+	background: url(../images/missed.jpg) no-repeat center center;
+	background-size: contain;
 }
-#player_field div, #computer_field div { 
+.player_field div, .computer_field div { 
     	width: 40px;
     	height: 40px;
     	float: left;

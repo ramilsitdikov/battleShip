@@ -2,22 +2,26 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" Content="text/html" charset="utf-8">
-		<link href="style.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<script src="js/battle.js" type="text/javascript"></script>
 	</head>
 	<body>
-	<div id="game_space">
+	<div class="game_space">
 		<div class="field">
-			<h3>Player field</h3>
-			<div id="player_field"></div>
+			<h3>Поле игрока</h3>
+			<div class="js_player player_field"></div>
 		</div>
 
 		<div class="field">
-			<h3> Computer field </h3>
-			<div id="computer_field"></div>
+			<h3>Поле компьютера</h3>
+			<div class="computer_field js-computer"></div>
 		</div>
-		<div id="output"></div>
+		<div class="output_field js-output">
+			<p>Конфигурация кораблей: 1 x 4, 2 x 3, 3 x 2, 4 x 1</p><br>
+			<p>Корабли не могут соприкасаться: между ними должна быть хотя бы одна пустая клетка.</p>
+		</div>
 	</div>
-  	<button id="start">Start the game</button>
-  	<script src="battle.js" type="text/javascript"></script>
+  	<button class="start_button js-start-button">Начать игру</button>
+  	
 	</body>
 </html>
