@@ -1,3 +1,4 @@
+/*common*/
 .game_space {
 	display: inline;
 	width: 600px;
@@ -13,18 +14,9 @@
 	margin: 10px;
 	border: 2px dashed red;
 }
-.ships-line {
-	color: grey;
-	margin: 10px;
-	line-height: 5px;
-	letter-spacing: 10px;
-}
-.player_field .ship {
-	background: url(../images/ship.png) no-repeat center center;
+.water {
+	background: url(../images/water.gif) no-repeat center center;
 	background-size: contain;
-}
-.computer_field .ship, .water {
-	background: #eee;
 }
 .dead {
 	background: url(../images/fire.gif) no-repeat center center;
@@ -37,6 +29,20 @@
 	background: url(../images/missed.jpg) no-repeat center center;
 	background-size: contain;
 }
+
+/*player*/
+.player_field .ship {
+	background: url(../images/ship.png) no-repeat center center;
+	background-size: contain;
+}
+
+/*computer*/
+.computer_field .ship{
+	background: #000099;
+}
+
+
+
 .player_field div, .computer_field div { 
     	width: 40px;
     	height: 40px;
