@@ -1,18 +1,31 @@
-function makeShipOrNot (fieldElement){
-  var mapElement;
-  if (fieldElement.className === 'water') {
-      fieldElement.className = 'ship';
-      mapElement = 's';
-  } else {
-      fieldElement.className = 'water';
-      mapElement = 'w';
+var WIDTH = 10,
+    HEIGHT = 10;
+
+function makeShipOrNot (fieldElement, map) {
+  if (fieldElement.className !== 'close') {
+    var elementRow = parseInt(fieldElement.getAttribute("row")),
+        elementCol = parseInt(fieldElement.getAttribute("col"));
+    if (fieldElement.className === 'water') {
+        fieldElement.className = 'ship';
+        map[elementRow][elementCol] = 's';
+    } else {
+        fieldElement.className = 'water';
+        map[elementRow][elementCol] = 'w';
+    }
+    map = rebuildMap(map);
+    var fieldElements = document.querySelectorAll(".js-player > div");
+      for (var r = 0, elemIndex = 0; r < HEIGHT; r++){
+        for (var c = 0; c < WIDTH; c++, elemIndex++){
+          fieldElements[elemIndex].className = setFieldElementClassName(map[r][c]);
+        }
+      }
+    return map;
   }
-  return mapElement;
 };
 
 function isEven (row, col) { return (row + col) % 2 === 0 ? true : false; };
 
-function fieldElementClassName (mapElement){
+function setFieldElementClassName (mapElement) {
   switch(mapElement){
     case '1': className = 'one'; break;
     case '2': className = 'two'; break;
@@ -28,7 +41,7 @@ function fieldElementClassName (mapElement){
   return className;
 };
 
-function findClosePoints (map, pointRow, pointCol){
+function findClosePoints (map, pointRow, pointCol) {
   var pointIsEven = isEven(pointRow, pointCol); 
   for (var row = pointRow - 1; row < pointRow + 2; row++) {
     for (var col = pointCol - 1; col < pointCol + 2; col++) {
@@ -40,19 +53,18 @@ function findClosePoints (map, pointRow, pointCol){
       }
     }
   }
-  console.log(map);
   return map;
 };
 
-function rebuildMap(map){
-  for (var row = 0; row < 10; row++){
-    for (var col = 0; col < 10; col++){
+function rebuildMap(map) {
+  for (var row = 0; row < HEIGHT; row++){
+    for (var col = 0; col < WIDTH; col++){
       if(map[row][col] === 'c')
         map[row][col] = 'w';
     }
   }
-  for (var row = 0; row < 10; row++){
-    for (var col = 0; col < 10; col++){
+  for (var row = 0; row < HEIGHT; row++){
+    for (var col = 0; col < WIDTH; col++){
       if(map[row][col] === 's')
         map = findClosePoints(map, row, col);
     }
@@ -60,17 +72,29 @@ function rebuildMap(map){
   return map;
 };
 
-function init() {
-  var WIDTH = 10,
-      HEIGHT = 10;
+function fire(fieldElement) {};
 
+function deactivateMap(map) {
+  var fieldElements = document.querySelectorAll(".js-player > div");
+    for (var row = 0, elemIndex = 0; row < HEIGHT; row++){
+      for (var col = 0; col < WIDTH; col++, elemIndex++){
+        if(map[row][col] === 'c')
+          map[row][col] = 'w';
+        fieldElements[elemIndex].className = setFieldElementClassName(map[row][col]);
+        fieldElements[elemIndex].onclick = function() {
+           return false;
+         };
+      }
+    }
+};
+
+function init() {
 
   var playerMap = new Array(HEIGHT),
       computerMap = new Array(HEIGHT),
       playerField = document.querySelector('.js-player'),
+      computerField = document.querySelector('.js-computer'),
       button = document.querySelector('.js-start');
-
-
   for (var row = 0; row < HEIGHT; row++) {
     playerMap[row] = new Array(HEIGHT);
     computerMap[row] = new Array(HEIGHT);
@@ -83,35 +107,34 @@ function init() {
   for (var row = 0; row < HEIGHT; row++) {
     for (var col = 0; col < WIDTH; col++) {
       var playerFieldElement = document.createElement('div');
-      playerFieldElement.className = fieldElementClassName(playerMap[row][col]);
+      playerFieldElement.className = 'water';
       playerFieldElement.setAttribute("row", row);
       playerFieldElement.setAttribute("col", col);
       playerFieldElement.onclick = function () {
-        if (this.className !== 'close') {
-          var elementRow = parseInt(this.getAttribute("row")),
-              elementCol = parseInt(this.getAttribute("col"));
-          playerMap[elementRow][elementCol] = makeShipOrNot(this);
-
-          /*analize and rebuild playerMap*/
-          var tempMap = rebuildMap(playerMap);
-          for (var r = 0; r < HEIGHT; r++)
-            for (var c = 0; c < WIDTH; c++)
-              playerMap[r][c] = tempMap[r][c];
-          var fieldElements = document.querySelectorAll(".js-player > div");
-          for (var r = 0, elemIndex = 0; r < HEIGHT; r++){
-            for (var c = 0; c < WIDTH; c++, elemIndex++){
-              fieldElements[elemIndex].className = fieldElementClassName(playerMap[r][c]);
-            }
-          }
-        }
+        playerMap = makeShipOrNot(this, playerMap);
       };
       playerField.appendChild(playerFieldElement);
     }
   }
 
   button.onclick = function () {
-    var fieldElements = document.querySelectorAll(".js-player > div");
-    console.log(fieldElements);
+    this.disabled = true;
+    playerMap = deactivateMap(playerMap);
+
+    
+
+    for (var row = 0; row < HEIGHT; row++) {
+      for (var col = 0; col < WIDTH; col++) {
+        var computerFieldElement = document.createElement('div');
+        computerFieldElement.className = setFieldElementClassName(computerMap[row][col]);
+        computerFieldElement.setAttribute("row", row);
+        computerFieldElement.setAttribute("col", col);
+        computerFieldElement.onclick = function () {
+          fire(this);
+        };
+        computerField.appendChild(computerFieldElement);
+      }
+    }
   };
 };
 window.addEventListener("DOMContentLoaded", init);

@@ -43,7 +43,8 @@
 
 /*computer*/
 .computer_field .ship{
-	background: #000099;
+	background: url(../images/ship.png) no-repeat center center;
+	background-size: contain;
 }
 
 
