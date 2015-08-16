@@ -5,15 +5,14 @@ function makeShipOrNot (fieldElement){
       mapElement = 's';
   } else {
       fieldElement.className = 'water';
-      mapElement = 'ship';
+      mapElement = 'w';
   }
   return mapElement;
 };
 
-function isEven (row, col) { return (row+col)%2 === 0 ? true : false; };
+function isEven (row, col) { return (row + col) % 2 === 0 ? true : false; };
 
 function fieldElementClassName (mapElement){
-  var className;
   switch(mapElement){
     case '1': className = 'one'; break;
     case '2': className = 'two'; break;
@@ -24,31 +23,41 @@ function fieldElementClassName (mapElement){
     case 'i': className = 'injured'; break;
     case 'm': className = 'missed'; break;
     case 'c': className = 'close'; break;
+    case 's':className = 'ship'; break;
   }
   return className;
 };
 
-function findPoints (map, pointRow, pointCol){
-  var nearbyPoints = { diag: [],
-            horizAndVert: [],
-          }
-  var pointEven = isEven(pointRow, pointCol);
+function findClosePoints (map, pointRow, pointCol){
+  var pointIsEven = isEven(pointRow, pointCol); 
   for (var row = pointRow - 1; row < pointRow + 2; row++) {
     for (var col = pointCol - 1; col < pointCol + 2; col++) {
       var mapPointExist = (map[row] !== undefined && map[row][col] !== undefined);
-      var pointIsDifferent = (row !== pointRow || col !== pointCol); 
-      if(mapPointExist && pointIsDifferent) {
-        var nearPoint = { row: row,
-                          col: col
-                        };
-        if (pointEven === isEven(row,col))
-          nearbyPoints.diag.push(nearPoint);
-        else
-          nearbyPoints.horizAndVert.push(nearPoint);
+      var pointIsDifferent = (row !== pointRow || col !== pointCol);
+      var pointIsInDiag = pointIsEven === isEven(row,col);
+      if(mapPointExist && pointIsDifferent && pointIsInDiag) {
+        map[row][col] = 'c';
       }
     }
   }
-  return nearbyPoints;
+  console.log(map);
+  return map;
+};
+
+function rebuildMap(map){
+  for (var row = 0; row < 10; row++){
+    for (var col = 0; col < 10; col++){
+      if(map[row][col] === 'c')
+        map[row][col] = 'w';
+    }
+  }
+  for (var row = 0; row < 10; row++){
+    for (var col = 0; col < 10; col++){
+      if(map[row][col] === 's')
+        map = findClosePoints(map, row, col);
+    }
+  }
+  return map;
 };
 
 function init() {
@@ -60,6 +69,7 @@ function init() {
       computerMap = new Array(HEIGHT),
       playerField = document.querySelector('.js-player'),
       button = document.querySelector('.js-start');
+
 
   for (var row = 0; row < HEIGHT; row++) {
     playerMap[row] = new Array(HEIGHT);
@@ -82,9 +92,17 @@ function init() {
               elementCol = parseInt(this.getAttribute("col"));
           playerMap[elementRow][elementCol] = makeShipOrNot(this);
 
-          /*analize and set char to playerMap*/
-
-          var nearbyPoints = findPoints(playerMap, elementRow, elementCol);
+          /*analize and rebuild playerMap*/
+          var tempMap = rebuildMap(playerMap);
+          for (var r = 0; r < HEIGHT; r++)
+            for (var c = 0; c < WIDTH; c++)
+              playerMap[r][c] = tempMap[r][c];
+          var fieldElements = document.querySelectorAll(".js-player > div");
+          for (var r = 0, elemIndex = 0; r < HEIGHT; r++){
+            for (var c = 0; c < WIDTH; c++, elemIndex++){
+              fieldElements[elemIndex].className = fieldElementClassName(playerMap[r][c]);
+            }
+          }
         }
       };
       playerField.appendChild(playerFieldElement);
@@ -92,7 +110,8 @@ function init() {
   }
 
   button.onclick = function () {
-    console.log(playerMap);
+    var fieldElements = document.querySelectorAll(".js-player > div");
+    console.log(fieldElements);
   };
 };
 window.addEventListener("DOMContentLoaded", init);
