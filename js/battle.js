@@ -43,8 +43,7 @@ function shipsExist (map) {
 };
 
 function deactivateMap (map, selector) {
-  var fieldElements = document.querySelectorAll(selector);
-  console.log(selector);  
+  var fieldElements = document.querySelectorAll(selector); 
   for (var row = 0, elemIndex = 0; row < HEIGHT; row++){
     for (var col = 0; col < WIDTH; col++, elemIndex++){
       if(map[row][col] === 'c')
@@ -146,12 +145,60 @@ function computerShot (map) {
   return niceShot;
 };
 
-function generateShips (map) {
-  var fourIsReady = false;
-  while(!fourIsReady) {
-    coordX = getRandomInt(0,9);
-    coordY = getRandomInt(0,9);
+function setShip(map, ship, shipLength) {
+  var rowLimit, colLimit;
+  if (ship[2] === 0) {
+    rowLimit = ship[1] + 1;
+    colLimit = ship[0] + shipLength;
+  } else {
+    rowLimit = ship[1] + shipLength;
+    colLimit = ship[0] + 1;
   }
+  for(var row = ship[1];row < rowLimit; row++)
+    for(var col = ship[0];col < colLimit; col++) {
+      if(map[row][col] === 's')
+        return false;
+      map[row][col] = 's';
+    }
+  return true;
+};
+
+function makeOneShip(shipLength, map) {
+  var ship,
+      coordX,
+      coordY,
+      direction,
+      shipIsReady = false;
+  while(!shipIsReady) {
+    ship = [];
+    coordCol = getRandomInt(0, 9),
+    coordRaw = getRandomInt(0, 9);
+    direction = getRandomInt(0,1);
+    ship.push(coordCol);
+    ship.push(coordRaw);
+    if(ship[direction] + shipLength <= 10) {
+      ship.push(direction);
+      shipIsReady = setShip(map, ship, shipLength);
+    }
+  }
+
+};
+
+function generateShips (map) {
+  /*ship with 4 cell*/
+  makeOneShip(4, map);
+  /*ship with 3 cell*/
+  makeOneShip(3, map);
+  makeOneShip(3, map);
+  /*ship with 2 cell*/
+  makeOneShip(2, map);
+  makeOneShip(2, map);
+  makeOneShip(2, map);
+  /*ship with 1 cell*/
+  makeOneShip(1, map);
+  makeOneShip(1, map);
+  makeOneShip(1, map);
+  makeOneShip(1, map);
 };
 
 
@@ -191,6 +238,7 @@ function init() {
   button.onclick = function () {
     this.disabled = true;
     deactivateMap(playerMap, '.js-player > div');
+    generateShips(computerMap);
 
     /*set computer field*/
     for (var row = 0; row < HEIGHT; row++) {
