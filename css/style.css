@@ -8,8 +8,8 @@
 	float: left;
 }
 .player_field, .computer_field {
-	width: 423px;
-	height: 423px;
+	width: 422px;
+	height: 422px;
 	float: left;
 	margin: 10px;
 	border: 2px dashed red;

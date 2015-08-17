@@ -7,6 +7,7 @@
 	</head>
 	<body>
 	<div class="game_space">
+
 		<div class="field">
 			<h3>Поле игрока</h3>
 			<div class="player_field js-player"></div>
@@ -16,12 +17,22 @@
 			<h3>Поле компьютера</h3>
 			<div class="computer_field js-computer"></div>
 		</div>
-		<div class="output_field js-output">
-			<p>Конфигурация кораблей: 1 x 4, 2 x 3, 3 x 2, 4 x 1</p><br>
-			<p>Корабли не могут соприкасаться: между ними должна быть хотя бы одна пустая клетка.</p>
+
+		<div class="field js-output">
+			<h3>Правила игры</h3>
+				<p>Порядок расстановки и конфигурация кораблей:<br>
+				<ol>
+					<li>один четырёхпалубник (1 x 4)</li>
+					<li>два трёхпалубника (2 x 3)</li>
+					<li>три двухпалубника (3 x 2)</li>
+					<li>четрые однопалубника (4 x 1)</li>
+				</p>
+				</ol>
+				<p>Корабли не могут соприкасаться:<br> между ними должна быть хотя бы одна пустая клетка.</p>
 		</div>
+
 	</div>
-  	<button class="start_button js-start">Начать игру</button>
+  <button class="start_button js-start">Начать игру</button>
   	
 	</body>
 </html>
