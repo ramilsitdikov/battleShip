@@ -100,9 +100,9 @@ function findClosePoints (map, pointRow, pointCol) {
   var pointIsEven = isEven(pointRow, pointCol); 
   for (var row = pointRow - 1; row < pointRow + 2; row++) {
     for (var col = pointCol - 1; col < pointCol + 2; col++) {
-      var mapPointExist = (map[row] !== undefined && map[row][col] !== undefined);
-      var pointIsDifferent = (row !== pointRow || col !== pointCol);
-      var pointIsInDiag = pointIsEven === isEven(row,col);
+      var mapPointExist = (map[row] !== undefined && map[row][col] !== undefined),
+          pointIsDifferent = (row !== pointRow || col !== pointCol),
+          pointIsInDiag = pointIsEven === isEven(row,col);
       if(mapPointExist && pointIsDifferent && pointIsInDiag) {
         map[row][col] = 'c';
       }
@@ -112,18 +112,15 @@ function findClosePoints (map, pointRow, pointCol) {
 };
 
 function rebuildMap (map) {
-  for (var row = 0; row < HEIGHT; row++){
-    for (var col = 0; col < WIDTH; col++){
+  for (var row = 0; row < HEIGHT; row++)
+    for (var col = 0; col < WIDTH; col++)
       if(map[row][col] === 'c')
         map[row][col] = 'w';
-    }
-  }
-  for (var row = 0; row < HEIGHT; row++){
-    for (var col = 0; col < WIDTH; col++){
+
+  for (var row = 0; row < HEIGHT; row++)
+    for (var col = 0; col < WIDTH; col++)
       if(map[row][col] === 's')
         map = findClosePoints(map, row, col);
-    }
-  }
   return map;
 };
 
@@ -145,60 +142,101 @@ function computerShot (map) {
   return niceShot;
 };
 
-function setShip(map, ship, shipLength) {
-  var rowLimit, colLimit;
-  if (ship[2] === 0) {
-    rowLimit = ship[1] + 1;
-    colLimit = ship[0] + shipLength;
-  } else {
-    rowLimit = ship[1] + shipLength;
-    colLimit = ship[0] + 1;
-  }
-  for(var row = ship[1];row < rowLimit; row++)
-    for(var col = ship[0];col < colLimit; col++) {
-      if(map[row][col] === 's')
-        return false;
-      map[row][col] = 's';
-    }
-  return true;
-};
-
 function makeOneShip(shipLength, map) {
   var ship,
-      coordX,
-      coordY,
+      coordCol,
+      coordRaw,
       direction,
-      shipIsReady = false;
+      shipIsReady,
+      tempMap;
   while(!shipIsReady) {
+    shipIsReady = true;
     ship = [];
+    tempMap = map;
     coordCol = getRandomInt(0, 9),
     coordRaw = getRandomInt(0, 9);
-    direction = getRandomInt(0,1);
+    direction = getRandomInt(0, 1);
     ship.push(coordCol);
     ship.push(coordRaw);
-    if(ship[direction] + shipLength <= 10) {
+    ship.push(direction);
+    while (!(ship[direction] + shipLength <= 10)) {
+      ship = [];
+      coordCol = getRandomInt(0, 9),
+      coordRaw = getRandomInt(0, 9);
+      direction = getRandomInt(0, 1);
+      ship.push(coordCol);
+      ship.push(coordRaw);
       ship.push(direction);
-      shipIsReady = setShip(map, ship, shipLength);
+    }
+
+    var rowLimit, colLimit;
+    if(ship[2] === 0) {
+      rowLimit = ship[1] + 1;
+      colLimit = ship[0] + shipLength;
+    } else {
+      rowLimit = ship[1] + shipLength;
+      colLimit = ship[0] + 1;
+    }
+    top:
+    for(var row = ship[1]; row < rowLimit; row++)
+      for(var col = ship[0]; col < colLimit; col++) {
+        if(tempMap[row][col] === 's' || tempMap[row][col] === 'c'){
+          shipIsReady = false;
+          break top;
+        } else {
+        tempMap[row][col] = 'z';
+        }
+      }
+
+    if(shipIsReady) {
+      for(var row = ship[1] - 1; row < rowLimit + 1; row++)
+        for(var col = ship[0] - 1; col < colLimit + 1; col++) {
+        var mapPointExist = (tempMap[row] !== undefined && tempMap[row][col] !== undefined);
+        if (mapPointExist) {
+          if (tempMap[row][col] === 's'){
+            shipIsReady = false;
+          }
+          else {
+            if (tempMap[row][col] === 'z')
+              tempMap[row][col] = 's';
+            else
+              tempMap[row][col] = 'c';
+          }
+        }
+      }
+    } else {
+      tempMap = map;
     }
   }
-
+  map = tempMap; 
 };
 
 function generateShips (map) {
   /*ship with 4 cell*/
   makeOneShip(4, map);
+  redrawField(map, '.js-computer > div')
   /*ship with 3 cell*/
   makeOneShip(3, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(3, map);
+  redrawField(map, '.js-computer > div')
   /*ship with 2 cell*/
   makeOneShip(2, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(2, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(2, map);
+  redrawField(map, '.js-computer > div')
+
   /*ship with 1 cell*/
   makeOneShip(1, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
+  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
+  redrawField(map, '.js-computer > div')
 };
 
 
@@ -238,7 +276,7 @@ function init() {
   button.onclick = function () {
     this.disabled = true;
     deactivateMap(playerMap, '.js-player > div');
-    generateShips(computerMap);
+    //generateShips(computerMap);
 
     /*set computer field*/
     for (var row = 0; row < HEIGHT; row++) {
@@ -266,6 +304,7 @@ function init() {
         computerField.appendChild(computerFieldElement);
       }
     }
+    generateShips(computerMap);
   };
 };
 window.addEventListener("DOMContentLoaded", init);
