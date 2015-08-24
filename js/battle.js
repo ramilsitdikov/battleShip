@@ -143,22 +143,30 @@ function computerShot (map) {
 };
 
 function makeOneShip(shipLength, map) {
+  var count = 0;
   var ship,
       coordCol,
       coordRaw,
       direction,
       shipIsReady,
-      tempMap;
+      tempMap = new Array(10);
   while(!shipIsReady) {
+    count++;
     shipIsReady = true;
     ship = [];
-    tempMap = map;
+    for (var row = 0; row < HEIGHT; row++) {
+      tempMap[row] = new Array(10);
+      for (var col = 0; col < WIDTH; col++)
+        tempMap[row][col] = map[row][col];
+    }
     coordCol = getRandomInt(0, 9),
     coordRaw = getRandomInt(0, 9);
     direction = getRandomInt(0, 1);
     ship.push(coordCol);
     ship.push(coordRaw);
     ship.push(direction);
+
+    /*generate x,y,dir*/
     while (!(ship[direction] + shipLength <= 10)) {
       ship = [];
       coordCol = getRandomInt(0, 9),
@@ -169,6 +177,7 @@ function makeOneShip(shipLength, map) {
       ship.push(direction);
     }
 
+    /*ship start and end points*/
     var rowLimit, colLimit;
     if(ship[2] === 0) {
       rowLimit = ship[1] + 1;
@@ -177,25 +186,23 @@ function makeOneShip(shipLength, map) {
       rowLimit = ship[1] + shipLength;
       colLimit = ship[0] + 1;
     }
-    top:
-    for(var row = ship[1]; row < rowLimit; row++)
-      for(var col = ship[0]; col < colLimit; col++) {
-        if(tempMap[row][col] === 's' || tempMap[row][col] === 'c'){
+
+    /*check are any ships on the way or near to it*/
+    for(var row = ship[1]; row < rowLimit && shipIsReady; row++)
+      for(var col = ship[0]; col < colLimit && shipIsReady; col++) {
+        if(tempMap[row][col] === 's' || tempMap[row][col] === 'c')
           shipIsReady = false;
-          break top;
-        } else {
-        tempMap[row][col] = 'z';
-        }
+        else
+          tempMap[row][col] = 'z';
       }
 
     if(shipIsReady) {
-      for(var row = ship[1] - 1; row < rowLimit + 1; row++)
-        for(var col = ship[0] - 1; col < colLimit + 1; col++) {
+      for(var row = ship[1] - 1; row < rowLimit + 1 && shipIsReady; row++)
+        for(var col = ship[0] - 1; col < colLimit + 1 && shipIsReady; col++) {
         var mapPointExist = (tempMap[row] !== undefined && tempMap[row][col] !== undefined);
-        if (mapPointExist) {
-          if (tempMap[row][col] === 's'){
+        if (mapPointExist)
+          if (tempMap[row][col] === 's')
             shipIsReady = false;
-          }
           else {
             if (tempMap[row][col] === 'z')
               tempMap[row][col] = 's';
@@ -203,12 +210,17 @@ function makeOneShip(shipLength, map) {
               tempMap[row][col] = 'c';
           }
         }
-      }
+
     } else {
-      tempMap = map;
+      for (var row = 0; row < HEIGHT; row++)
+        for (var col = 0; col < WIDTH; col++)
+          tempMap[row][col] = map[row][col];
     }
   }
-  map = tempMap; 
+
+  for (var row = 0; row < HEIGHT; row++)
+      for (var col = 0; col < WIDTH; col++)
+        map[row][col] = tempMap[row][col];
 };
 
 function generateShips (map) {
@@ -273,6 +285,7 @@ function init() {
     }
   }
 
+  /*start game*/
   button.onclick = function () {
     this.disabled = true;
     deactivateMap(playerMap, '.js-player > div');
