@@ -226,29 +226,23 @@ function makeOneShip(shipLength, map) {
 function generateShips (map) {
   /*ship with 4 cell*/
   makeOneShip(4, map);
-  redrawField(map, '.js-computer > div')
+
   /*ship with 3 cell*/
   makeOneShip(3, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(3, map);
-  redrawField(map, '.js-computer > div')
+
   /*ship with 2 cell*/
   makeOneShip(2, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(2, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(2, map);
-  redrawField(map, '.js-computer > div')
 
   /*ship with 1 cell*/
   makeOneShip(1, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
-  redrawField(map, '.js-computer > div')
   makeOneShip(1, map);
-  redrawField(map, '.js-computer > div')
+
+  redrawField(map, '.js-computer > div');
 };
 
 
