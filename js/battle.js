@@ -84,9 +84,12 @@ function playerShot (fieldElement, map) {
   var niceShot = false;
   var elementRow = parseInt(fieldElement.getAttribute("row")),
        elementCol = parseInt(fieldElement.getAttribute("col"));
+  var alreadyShootThere = fieldElement.className === 'missed' || fieldElement.className === 'dead';
   if (fieldElement.className === 'ship'){
     fieldElement.className = 'dead';
     map[elementRow][elementCol] = 'd';
+    niceShot = true;
+  } else if (alreadyShootThere) {
     niceShot = true;
   } else {
     fieldElement.className = 'missed';
