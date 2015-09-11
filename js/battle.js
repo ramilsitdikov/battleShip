@@ -38,12 +38,12 @@ function shipsExist (map) {
   for (var row = 0; row < HEIGHT; row++)
     for (var col = 0; col < WIDTH; col++)
       if(map[row][col] === 's')
-        return true; 
+        return true;
   return false;
 };
 
 function deactivateMap (map, selector) {
-  var fieldElements = document.querySelectorAll(selector); 
+  var fieldElements = document.querySelectorAll(selector);
   for (var row = 0, elemIndex = 0; row < HEIGHT; row++){
     for (var col = 0; col < WIDTH; col++, elemIndex++){
       if(map[row][col] === 'c')
@@ -58,11 +58,64 @@ function deactivateMap (map, selector) {
 };
 
 /*player only*/
+function makingShipAllowed(map, elementRow, elementCol) {
+  var tempMap = new Array(HEIGHT);
+  for (var row = 0; row < HEIGHT; row++) {
+    tempMap[row] = new Array(HEIGHT);
+    for (var col = 0; col < WIDTH; col++)
+      tempMap[row][col] = map[row][col];
+  }
+  var shipsHor = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+  var shipsVert = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+  var shipTogetherCounter;
+  for (var row = 0; row < HEIGHT; row++)
+    for (var col = 0; col < WIDTH; col++)
+    {
+      shipTogetherCounter = 0;
+      while(tempMap[row][col] === 's' && col < WIDTH) {
+        shipTogetherCounter++;
+        col++;
+      }
+      shipsHor[shipTogetherCounter]++;
+    }
+
+  for (var col = 0; col < HEIGHT; col++)
+    for (var row = 0; row < WIDTH; row++)
+    {
+      shipTogetherCounter = 0;
+      while(tempMap[row][col] === 's' && row < HEIGHT) {
+        shipTogetherCounter++;
+        col++;
+      }
+      shipsVert[shipTogetherCounter]++;
+    }
+console.log(shipsHor);
+console.log(shipsVert);
+for (var shipNumber = 1; shipNumber < 5; shipNumber++) {
+  console.log(shipNumber);
+  if(shipsHor[shipNumber] > 5 - shipNumber || shipsVert[shipNumber] > 5 - shipNumber || shipsHor.length > 5 || shipsVert.length > 5)
+    return false;
+}
+
+  /*var row = elementRow, col = elementCol,
+        counterShipsUp = 0, counterShipsDown = 0, counterShipsLeft = 0, counterShipsRight = 0;
+  while(map[row][col] === 's' && map[row] !== undefined) {
+    countercounterShipsUp++;
+    row++;
+  }
+  row = elementRow;l
+  while(map[row][col] === 's' && map[row] !== undefined) {
+    countercounterShipsDown++;
+    row--;
+  }*/
+    return true;
+};
+
 function makeShipOrNot (fieldElement, map) {
   if (fieldElement.className !== 'close') {
     var elementRow = parseInt(fieldElement.getAttribute("row")),
         elementCol = parseInt(fieldElement.getAttribute("col"));
-    if (fieldElement.className === 'water') {
+    if (fieldElement.className === 'water' && makingShipAllowed(map, elementRow, elementCol)) {
         fieldElement.className = 'ship';
         map[elementRow][elementCol] = 's';
     } else {
@@ -100,7 +153,7 @@ function playerShot (fieldElement, map) {
 };
 
 function findClosePoints (map, pointRow, pointCol) {
-  var pointIsEven = isEven(pointRow, pointCol); 
+  var pointIsEven = isEven(pointRow, pointCol);
   for (var row = pointRow - 1; row < pointRow + 2; row++) {
     for (var col = pointCol - 1; col < pointCol + 2; col++) {
       var mapPointExist = (map[row] !== undefined && map[row][col] !== undefined),
@@ -251,7 +304,7 @@ function generateShips (map) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 function init() {
-  
+
   /*initialize variables*/
   var playerMap = new Array(HEIGHT),
       computerMap = new Array(HEIGHT),
@@ -286,7 +339,6 @@ function init() {
   button.onclick = function () {
     this.disabled = true;
     deactivateMap(playerMap, '.js-player > div');
-    //generateShips(computerMap);
 
     /*set computer field*/
     for (var row = 0; row < HEIGHT; row++) {
