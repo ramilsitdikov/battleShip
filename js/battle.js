@@ -1,6 +1,7 @@
 /*global vars*/
 var WIDTH = 10,
     HEIGHT = 10;
+var ShipsOnField = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
 
 /*math*/
 function getRandomInt (min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -65,6 +66,7 @@ function makingShipAllowed(map, elementRow, elementCol) {
     for (var col = 0; col < WIDTH; col++)
       tempMap[row][col] = map[row][col];
   }
+  tempMap[elementRow][elementCol] = 's';
   var shipsHor = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
   var shipsVert = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
   var shipTogetherCounter;
@@ -80,8 +82,7 @@ function makingShipAllowed(map, elementRow, elementCol) {
     }
 
   for (var col = 0; col < HEIGHT; col++)
-    for (var row = 0; row < WIDTH; row++)
-    {
+    for (var row = 0; row < WIDTH; row++) {
       shipTogetherCounter = 0;
       while(tempMap[row][col] === 's' && row < HEIGHT) {
         shipTogetherCounter++;
@@ -89,25 +90,11 @@ function makingShipAllowed(map, elementRow, elementCol) {
       }
       shipsVert[shipTogetherCounter]++;
     }
-console.log(shipsHor);
-console.log(shipsVert);
-for (var shipNumber = 1; shipNumber < 5; shipNumber++) {
-  console.log(shipNumber);
-  if(shipsHor[shipNumber] > 5 - shipNumber || shipsVert[shipNumber] > 5 - shipNumber || shipsHor.length > 5 || shipsVert.length > 5)
-    return false;
-}
 
-  /*var row = elementRow, col = elementCol,
-        counterShipsUp = 0, counterShipsDown = 0, counterShipsLeft = 0, counterShipsRight = 0;
-  while(map[row][col] === 's' && map[row] !== undefined) {
-    countercounterShipsUp++;
-    row++;
+  for (var shipNumber = 1; shipNumber < 5; shipNumber++) {
+    if(shipsHor[shipNumber] > 5 - shipNumber || shipsVert[shipNumber] > 5 - shipNumber || shipsHor.length > 5 || shipsVert.length > 5)
+      return false;
   }
-  row = elementRow;l
-  while(map[row][col] === 's' && map[row] !== undefined) {
-    countercounterShipsDown++;
-    row--;
-  }*/
     return true;
 };
 
