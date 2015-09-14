@@ -1,17 +1,16 @@
 /*global vars*/
 var WIDTH = 10,
     HEIGHT = 10;
-var ShipsOnField = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
 
 /*math*/
-function getRandomInt (min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function getRandomInt (min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; };
 
 function isEven (row, col) { return (row + col) % 2 === 0 ? true : false; };
 
 /*common for player and computer*/
 function setFieldElementClassName (mapElement) {
   var className;
-  switch(mapElement){
+  switch(mapElement) {
     case '1': className = 'one'; break;
     case '2': className = 'two'; break;
     case '3': className = 'three'; break;
@@ -59,6 +58,57 @@ function deactivateMap (map, selector) {
 };
 
 /*player only*/
+function findOnes(map) {
+  var ones = 0;
+  for (var row = 0; row < HEIGHT; row++)
+    for (var col = 0; col < WIDTH; col++)
+      if(map[row][col] === 's') {
+        var upNotShip = (row === 0) || (row !== 0 && map[row - 1][col] !== 's');
+        var downNotShip = (row === 9) || (row !== 9 && map[row + 1][col] !== 's');
+        var rightNotShip = (col === 9) || (col !== 9 && map[row][col + 1] !== 's');
+        var leftNotShip = (col === 0) || (col !== 0 && map[row][col - 1] !== 's');
+
+        if(upNotShip && downNotShip && rightNotShip && leftNotShip){
+          ones ++;
+          console.log(row,col, upNotShip, downNotShip, rightNotShip, leftNotShip);
+        }
+      }
+    console.log(ones);
+  return ones;
+};
+
+function fieldIsReady(map) {
+  var shipsHor = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+  var shipsVert = Array.apply(null, Array(5)).map(Number.prototype.valueOf,0);
+  var shipTogetherCounter;
+  for (var row = 0; row < HEIGHT; row++)
+    for (var col = 0; col < WIDTH; col++)
+    {
+      shipTogetherCounter = 0;
+      while(map[row][col] === 's' && col < WIDTH) {
+        shipTogetherCounter++;
+        col++;
+      }
+      shipsHor[shipTogetherCounter]++;
+    }
+
+  for (var col = 0; col < HEIGHT; col++)
+    for (var row = 0; row < WIDTH; row++) {
+      shipTogetherCounter = 0;
+      while(row < HEIGHT && map[row][col] === 's') {
+        shipTogetherCounter++;
+        row++;
+      }
+      shipsVert[shipTogetherCounter]++;
+    }
+  for (var shipNumber = 2; shipNumber < 5; shipNumber++) {
+    if(shipsHor[shipNumber] + shipsVert[shipNumber] === 5 - shipNumber && findOnes(map) === 4)
+      return true;
+  }
+
+  return false;
+};
+
 function makingShipAllowed(map, elementRow, elementCol) {
   var tempMap = new Array(HEIGHT);
   for (var row = 0; row < HEIGHT; row++) {
@@ -84,18 +134,18 @@ function makingShipAllowed(map, elementRow, elementCol) {
   for (var col = 0; col < HEIGHT; col++)
     for (var row = 0; row < WIDTH; row++) {
       shipTogetherCounter = 0;
-      while(tempMap[row][col] === 's' && row < HEIGHT) {
+      while(row < HEIGHT && tempMap[row][col] === 's') {
         shipTogetherCounter++;
-        col++;
+        row++;
       }
       shipsVert[shipTogetherCounter]++;
     }
-
-  for (var shipNumber = 1; shipNumber < 5; shipNumber++) {
-    if(shipsHor[shipNumber] > 5 - shipNumber || shipsVert[shipNumber] > 5 - shipNumber || shipsHor.length > 5 || shipsVert.length > 5)
+  for (var shipNumber = 2; shipNumber < 5; shipNumber++) {
+    if(shipsHor[shipNumber] + shipsVert[shipNumber] > 5 - shipNumber || shipsHor.length > 5 || shipsVert.length > 5 || findOnes(tempMap) > 4)
       return false;
   }
-    return true;
+
+  return true;
 };
 
 function makeShipOrNot (fieldElement, map) {
@@ -324,36 +374,38 @@ function init() {
 
   /*start game*/
   button.onclick = function () {
-    this.disabled = true;
-    deactivateMap(playerMap, '.js-player > div');
+    if (fieldIsReady(playerMap)) {
+      this.disabled = true;
+      deactivateMap(playerMap, '.js-player > div');
 
-    /*set computer field*/
-    for (var row = 0; row < HEIGHT; row++) {
-      for (var col = 0; col < WIDTH; col++) {
-        var computerFieldElement = document.createElement('div');
-        computerFieldElement.className = setFieldElementClassName(computerMap[row][col]);
-        computerFieldElement.setAttribute("row", row);
-        computerFieldElement.setAttribute("col", col);
-        computerFieldElement.onclick = function () {
-          if (!playerShot(this, computerMap)){
-            var computerHit = computerShot(playerMap);
-            while (computerHit && shipsExist(playerMap)) {
-              computerHit = computerShot(playerMap);
+      /*set computer field*/
+      for (var row = 0; row < HEIGHT; row++) {
+        for (var col = 0; col < WIDTH; col++) {
+          var computerFieldElement = document.createElement('div');
+          computerFieldElement.className = setFieldElementClassName(computerMap[row][col]);
+          computerFieldElement.setAttribute("row", row);
+          computerFieldElement.setAttribute("col", col);
+          computerFieldElement.onclick = function () {
+            if (!playerShot(this, computerMap)){
+              var computerHit = computerShot(playerMap);
+              while (computerHit && shipsExist(playerMap)) {
+                computerHit = computerShot(playerMap);
+              }
             }
-          }
-          if(!shipsExist(computerMap)) {
-            outputField.innerHTML += "<div>Вы одержали победу!</div>";
-            deactivateMap(computerMap, '.js-computer > div');
-          }
-          else if (!shipsExist(playerMap)) {
-            outputField.innerHTML += "<div>Вы потерпели поражение!</div>";
-            deactivateMap(computerMap, '.js-computer > div');
-          }
-        };
-        computerField.appendChild(computerFieldElement);
+            if(!shipsExist(computerMap)) {
+              outputField.innerHTML += "<div>Вы одержали победу!</div>";
+              deactivateMap(computerMap, '.js-computer > div');
+            }
+            else if (!shipsExist(playerMap)) {
+              outputField.innerHTML += "<div>Вы потерпели поражение!</div>";
+              deactivateMap(computerMap, '.js-computer > div');
+            }
+          };
+          computerField.appendChild(computerFieldElement);
+        }
       }
+      generateShips(computerMap);
     }
-    generateShips(computerMap);
   };
 };
 window.addEventListener("DOMContentLoaded", init);

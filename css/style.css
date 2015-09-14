@@ -8,10 +8,10 @@
 	float: left;
 }
 .player_field, .computer_field {
-	width: 422px;
-	height: 422px;
+	width: 400px;
+	height: 400px;
 	float: left;
-	margin: 10px;
+	margin: 5px;
 	border: 2px dashed red;
 }
 .water {
@@ -23,7 +23,6 @@
 	background-size: contain;
 }
 .injured {
-
 }
 .missed {
 	background: url(../images/missed.jpg) no-repeat center center;
@@ -43,20 +42,19 @@
 
 /*computer*/
 .computer_field .ship{
-	background: url(../images/ship.png) no-repeat center center;
+	background: url(../images/water.gif) no-repeat center center;
 	background-size: contain;
 }
 .computer_field .close {
 	background: url(../images/water.gif) no-repeat center center;
 	background-size: contain;
-	opacity: 0.7;
 }
 
 
 
-.player_field div, .computer_field div { 
-    	width: 40px;
-    	height: 40px;
+.player_field div, .computer_field div {
+    	width: 9%;
+    	height: 9%;
     	float: left;
-    	border: 1px solid black;
+    	border: 2px solid black;
     }
